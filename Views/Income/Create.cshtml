@@ -1,0 +1,45 @@
+﻿@model ExpenseTracker.Models.ViewModels.IncomeViewModels.IncomeCreateViewModel
+
+<div class="container my-4">
+    <h2 class="text-success text-center mb-4">Add Income</h2>
+
+    <div class="card shadow-lg mb-4" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-header bg-gradient-success text-center">
+            <h5 class="mb-0">Enter Your Income Details</h5>
+            <p class="small mt-2">Track your earnings with ease.</p>
+        </div>
+        <div class="card-body px-4 py-3">
+            <form asp-action="Create" method="post">
+                <div class="form-group mb-3">
+                    <label asp-for="Amount" class="form-label">Amount <span class="text-danger">*</span></label>
+                    <input asp-for="Amount" class="form-control form-control-lg" placeholder="Enter income amount" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Date" class="form-label">Date</label>
+                    <input asp-for="Date" class="form-control form-control-lg" type="date" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Source" class="form-label">Source <span class="text-danger">*</span></label>
+                    <input asp-for="Source" class="form-control form-control-lg" placeholder="Enter income source" />
+                    <span asp-validation-for="Source" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <input asp-for="Description" class="form-control form-control-lg" placeholder="Add description" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success btn-lg px-4 py-2 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Submit Income
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model ExpenseTracker.Models.ViewModels.HomeViewModels.HomeIndexViewModel
+
+<div class="container my-5">
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+        <h1 class="text-success">Financial Overview & Insights</h1>
+        <p class="text-muted">Track your financial health and monitor overdraft statuses</p>
+    </div>
+
+    <!-- Card: Financial Overview -->
+    <div class="card shadow-sm mx-auto mb-4" style="max-width: 800px;">
+        <div class="card-header bg-success text-white text-center">
+            <h3 class="mb-0">Balance & Overdraft Insights</h3>
+        </div>
+        <div class="card-body px-3 py-3">
+            <!-- Available Balance Section -->
+            <div class="mb-3">
+                <h4 class="text-muted">Your Available Balance</h4>
+                @if (Model.TotalBalance < 0)
+                {
+                    <div class="alert alert-danger text-center mb-3" role="alert">
+                        <strong>Warning:</strong> Your balance is below zero!
+                        <h3 class="text-danger mt-2">-@Model.TotalBalance.ToString("C")</h3>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success text-center mb-3" role="alert">
+                        <strong>Current balance is:</strong>
+                        <h3 class="text-success mt-2">@Model.TotalBalance.ToString("C")</h3>
+                    </div>
+                }
+            </div>
+
+            <!-- Remaining Overdraft -->
+            <div class="mb-3">
+                <h4 class="text-muted">Remaining Overdraft Amount</h4>
+                @if (Model.RemainingOverdraftLimit < 0)
+                {
+                    <div class="alert alert-danger text-center mb-3" role="alert">
+                        <strong>Overdraft Alert:</strong> You have exceeded your overdraft limit.
+                        <h3 class="text-danger mt-2">-@Model.RemainingOverdraftLimit.ToString("C")</h3>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success text-center mb-3" role="alert">
+                        <strong>Allowed overdraft left:</strong>
+                        <h3 class="text-success mt-2">@Model.RemainingOverdraftLimit.ToString("C")</h3>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Action Buttons Section -->
+    <div class="container mt-3">
+        <div class="row justify-content-center mb-3">
+            <div class="col-md-3 col-sm-6 text-center mb-2">
+                <a href="@Url.Action("Create", "Income")" class="btn btn-success btn-lg btn-block">
+                    <i class="bi bi-plus-circle"></i> Add Income
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6 text-center mb-2">
+                <a href="@Url.Action("Create", "Expense")" class="btn btn-secondary btn-lg btn-block">
+                    <i class="bi bi-dash-circle"></i> Add Expense
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mb-3">
+            <div class="col-md-3 col-sm-6 text-center mb-2">
+                <a href="@Url.Action("Index", "Income")" class="btn btn-outline-primary btn-lg btn-block">
+                    <i class="bi bi-wallet2"></i> View All Incomes
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6 text-center mb-2">
+                <a href="@Url.Action("Index", "Expense")" class="btn btn-outline-secondary btn-lg btn-block">
+                    <i class="bi bi-eye"></i> View All Expenses
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mb-3">
+            <div class="col-md-3 col-sm-6 text-center mb-2">
+                <a href="@Url.Action("SetOverdraftLimit", "Account")" class="btn btn-outline-success btn-lg btn-block">
+                    <i class="bi bi-sliders"></i> Set Overdraft Limit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
