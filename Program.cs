@@ -1,5 +1,7 @@
 using ExpenseTracker.Data;
 using ExpenseTracker.Models;
+using ExpenseTracker.Services.Interface;
+using ExpenseTracker.Services;
 using ExpenseTracker.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<HelperMethods>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
