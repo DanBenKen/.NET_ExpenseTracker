@@ -6,7 +6,7 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
     {
         [Required]
         [Display(Name = "Amount")]
-        public decimal? Amount { get; set; }
+        public decimal Amount { get; set; }
 
         [Required]
         [Display(Name = "Date")]

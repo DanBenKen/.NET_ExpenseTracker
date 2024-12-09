@@ -24,16 +24,17 @@ namespace ExpenseTracker.Controllers
             _helperMethods = helperMethods;
         }
 
-        public async Task<IActionResult> Index(int? month, int? year, string category)
+        public async Task<IActionResult> Index(int? month, int? year, string category, int pageNumber = 1, int pageSize = 10, bool showAll = false)
         {
+            month ??= DateTime.Now.Month;
+            year ??= DateTime.Now.Year;
+
             var userId = _userManager.GetUserId(User);
 
             var expensesQuery = _context.Expenses
                 .Where(e => e.UserId == userId);
 
             bool hasValidCategory = !string.IsNullOrEmpty(category) && category != "AllCategories";
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
 
             if (hasValidCategory)
             {
@@ -42,19 +43,38 @@ namespace ExpenseTracker.Controllers
 
             expensesQuery = expensesQuery.Where(e => e.Date.Month == month && e.Date.Year == year);
 
-            var expenses = await expensesQuery.ToListAsync();
-
-            var viewModel = new ExpenseIndexViewModel
+            if (showAll)
             {
-                Expenses = expenses,
+                var allExpenses = await expensesQuery.ToListAsync();
+                var viewModel = new ExpenseIndexViewModel
+                {
+                    Expenses = allExpenses,
+                    SelectedMonth = month,
+                    SelectedYear = year,
+                    SelectedCategory = category,
+                    ShowAll = true,
+                    Months = _helperMethods.GetMonths(),
+                    Categories = _helperMethods.GetCategories()
+                };
+
+                return View(viewModel);
+            }
+
+            var paginatedExpenses = await PaginatedList<Expense>.CreateAsync(expensesQuery, pageNumber, pageSize);
+
+            var viewModelPaginated = new ExpenseIndexViewModel
+            {
+                Expenses = paginatedExpenses.Items,
+                PaginatedItems = paginatedExpenses,
                 SelectedMonth = month,
                 SelectedYear = year,
                 SelectedCategory = category,
+                ShowAll = false,
                 Months = _helperMethods.GetMonths(),
                 Categories = _helperMethods.GetCategories()
             };
 
-            return View(viewModel);
+            return View(viewModelPaginated);
         }
 
         public IActionResult Create()

@@ -1,18 +1,44 @@
 ﻿@model ExpenseTracker.Models.ViewModels.AccountViewModels.LoginViewModel
 
-<h2>Login</h2>
-<form asp-action="Login" method="post">
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
+<div class="container d-flex align-items-center justify-content-center mt-5">
+    <div class="card shadow-lg p-4 rounded-3" style="width: 100%; max-width: 400px;">
+        <div class="text-center mb-3">
+            <h2 class="text-primary">Welcome</h2>
+            <p class="text-muted">Please login to your account to continue</p>
+        </div>
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Password</label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-lg">Login</button>
+            </div>
+
+            <div class="text-center mb-2">
+                <span>Or login with:</span>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <button type="button" class="btn btn-outline-danger">Google</button>
+                <button type="button" class="btn btn-outline-primary">Facebook</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <span>Don't have an account? <a asp-action="Register" class="text-success">Sign up here</a></span>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" type="password" />
-    </div>
-    <div class="form-group form-check">
-        <input asp-for="RememberMe" class="form-check-input" />
-        <label asp-for="RememberMe">Remember Me</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</div>

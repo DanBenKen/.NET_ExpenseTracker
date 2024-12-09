@@ -100,7 +100,7 @@ namespace ExpenseTracker.Controllers
             return View(viewModel);
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetOverdraftLimit(SetOverdraftLimitViewModel model)
@@ -126,5 +126,4 @@ namespace ExpenseTracker.Controllers
             return RedirectToAction("Index", "Home");
         }
     }
-
 }

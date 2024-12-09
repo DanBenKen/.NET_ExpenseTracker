@@ -22,17 +22,18 @@ namespace ExpenseTracker.Controllers
             _userManager = userManager;
             _helperMethods = helperMethods;
         }
-        public async Task<IActionResult> Index(int? month, int? year, string? source)
+
+        public async Task<IActionResult> Index(int? month, int? year, string? source, int pageNumber = 1, int pageSize = 10, bool showAll = false)
         {
+            month ??= DateTime.Now.Month;
+            year ??= DateTime.Now.Year;
+            source ??= "AllSources";
+
             var userId = _userManager.GetUserId(User);
 
             var incomesQuery = _context.Incomes.Where(i => i.UserId == userId);
 
             bool hasValidSource = !string.IsNullOrEmpty(source) && source != "AllSources";
-
-            month ??= DateTime.Now.Month;
-            year ??= DateTime.Now.Year;
-
             if (hasValidSource)
             {
                 incomesQuery = incomesQuery.Where(e => e.Source == source);
@@ -40,19 +41,39 @@ namespace ExpenseTracker.Controllers
 
             incomesQuery = incomesQuery.Where(i => i.Date.Month == month && i.Date.Year == year);
 
-            var incomes = await incomesQuery.ToListAsync();
-
-            var viewModel = new IncomeViewModel
+            if (showAll)
             {
-                Incomes = incomes,
+                var allIncomes = await incomesQuery.ToListAsync();
+
+                var viewModel = new IncomeIndexViewModel
+                {
+                    Incomes = allIncomes,
+                    SelectedMonth = month,
+                    SelectedYear = year,
+                    SelectedSource = source,
+                    ShowAll = true,
+                    Months = _helperMethods.GetMonths(),
+                    Sources = _helperMethods.GetSources(),
+                };
+
+                return View(viewModel);
+            }
+
+            var paginatedIncomes = await PaginatedList<Income>.CreateAsync(incomesQuery, pageNumber, pageSize);
+
+            var viewModelPaginated = new IncomeIndexViewModel
+            {
+                Incomes = paginatedIncomes.Items,
+                PaginatedItems = paginatedIncomes,
                 SelectedMonth = month,
                 SelectedYear = year,
                 SelectedSource = source,
+                ShowAll = false,
                 Months = _helperMethods.GetMonths(),
                 Sources = _helperMethods.GetSources(),
             };
 
-            return View(viewModel);
+            return View(viewModelPaginated);
         }
 
         public IActionResult Create()
@@ -62,7 +83,7 @@ namespace ExpenseTracker.Controllers
 
             var viewModel = new IncomeCreateViewModel
             {
-                Amount = null,
+                Amount = income.Amount,
                 Date = DateTime.Now,
                 Source = "",
                 Description = "",
@@ -109,7 +130,7 @@ namespace ExpenseTracker.Controllers
 
             var viewModel = new IncomeCreateViewModel
             {
-                Amount = income.Amount ?? 0m,
+                Amount = income.Amount,
                 Date = income.Date,
                 Source = income.Source,
                 Description = income.Description
@@ -162,6 +183,5 @@ namespace ExpenseTracker.Controllers
 
             return RedirectToAction("Index");
         }
-
     }
 }

@@ -1,60 +1,68 @@
 ﻿@model ExpenseTracker.Models.ViewModels.HomeViewModels.HomeIndexViewModel
 
-<div class="container my-5">
-    <!-- Page Header -->
+<div class="container">
     <div class="text-center mb-4">
         <h1 class="text-success">Financial Overview & Insights</h1>
         <p class="text-muted">Track your financial health and monitor overdraft statuses</p>
     </div>
 
-    <!-- Card: Financial Overview -->
     <div class="card shadow-sm mx-auto mb-4" style="max-width: 800px;">
         <div class="card-header bg-success text-white text-center">
             <h3 class="mb-0">Balance & Overdraft Insights</h3>
         </div>
         <div class="card-body px-3 py-3">
-            <!-- Available Balance Section -->
-            <div class="mb-3">
-                <h4 class="text-muted">Your Available Balance</h4>
-                @if (Model.TotalBalance < 0)
-                {
-                    <div class="alert alert-danger text-center mb-3" role="alert">
-                        <strong>Warning:</strong> Your balance is below zero!
-                        <h3 class="text-danger mt-2">-@Model.TotalBalance.ToString("C")</h3>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-success text-center mb-3" role="alert">
-                        <strong>Current balance is:</strong>
-                        <h3 class="text-success mt-2">@Model.TotalBalance.ToString("C")</h3>
-                    </div>
-                }
-            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <h4 class="text-muted">Your Available Balance</h4>
+                    @if (Model.TotalBalance < 0)
+                    {
+                        <div class="alert alert-danger text-center mb-3" role="alert">
+                            <h4>Warning:</h4> Your balance is below zero!
+                            <h3 class="text-danger mt-2">-@Model.TotalBalance.ToString("C")</h3>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center mb-3" role="alert">
+                            <h3 class="text-success mt-2">@Model.TotalBalance.ToString("C")</h3>
+                        </div>
+                    }
+                </div>
 
-            <!-- Remaining Overdraft -->
-            <div class="mb-3">
-                <h4 class="text-muted">Remaining Overdraft Amount</h4>
-                @if (Model.RemainingOverdraftLimit < 0)
-                {
-                    <div class="alert alert-danger text-center mb-3" role="alert">
-                        <strong>Overdraft Alert:</strong> You have exceeded your overdraft limit.
-                        <h3 class="text-danger mt-2">-@Model.RemainingOverdraftLimit.ToString("C")</h3>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-success text-center mb-3" role="alert">
-                        <strong>Allowed overdraft left:</strong>
-                        <h3 class="text-success mt-2">@Model.RemainingOverdraftLimit.ToString("C")</h3>
-                    </div>
-                }
-            </div>
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <h4 class="text-muted">Remaining Overdraft Amount</h4>
+                    @if (Model.RemainingOverdraftLimit < 0)
+                    {
+                        <div class="alert alert-danger text-center mb-3" role="alert">
+                            <h4>Overdraft Alert:</h4> You have exceeded your overdraft limit.
+                            <h3 class="text-danger mt-2">-@Model.RemainingOverdraftLimit.ToString("C")</h3>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center mb-3" role="alert">
+                            <h3 class="text-success mt-2">@Model.RemainingOverdraftLimit.ToString("C")</h3>
+                        </div>
+                    }
+                </div>
 
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="alert alert-success text-center">
+                        <h4 class="text-success">Income this month</h4>
+                        <h3 class="text-success">@Model.IncomesAmount.ToString("C")</h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="alert alert-danger text-center">
+                        <h4 class="text-danger">Expense this month</h4>
+                        <h3 class="text-danger">@Model.ExpensesAmount.ToString("C")</h3>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Action Buttons Section -->
     <div class="container mt-3">
         <div class="row justify-content-center mb-3">
             <div class="col-md-3 col-sm-6 text-center mb-2">

@@ -1,7 +1,6 @@
-﻿@model ExpenseTracker.Models.ViewModels.IncomeViewModels.IncomeViewModel
+﻿@model ExpenseTracker.Models.ViewModels.IncomeViewModels.IncomeIndexViewModel
 
-<div class="container my-4">
-    <!-- Filter Income Section -->
+<div class="container mt-5">
     <div class="row mb-3">
         <div class="col-8">
             <div class="card shadow-sm mb-4" style="max-width: 800px; margin: 0 auto;">
@@ -11,25 +10,21 @@
                 <div class="card-body px-4 pt-3">
                     <form method="get" asp-action="Index" asp-controller="Income">
                         <div class="row d-flex justify-content-center align-items-center">
-                            <!-- Month Selector -->
                             <div class="col-md-3">
                                 <label class="form-label">Month</label>
                                 <select name="month" asp-for="SelectedMonth" asp-items="Model.Months" class="form-select bg-light"></select>
                             </div>
 
-                            <!-- Year Selector -->
                             <div class="col-md-3">
                                 <label class="form-label">Year</label>
                                 <input type="number" name="year" asp-for="SelectedYear" class="form-control bg-light" placeholder="e.g., 2024" />
                             </div>
 
-                            <!-- Source Selector -->
                             <div class="col-md-3">
                                 <label class="form-label">Source</label>
                                 <select name="source" asp-for="SelectedSource" asp-items="Model.Sources" class="form-select bg-light"></select>
                             </div>
 
-                            <!-- Filter Button -->
                             <div class="col-md-3 text-center">
                                 <button class="btn btn-primary" type="submit">Apply Filters</button>
                             </div>
@@ -86,12 +81,54 @@
         </div>
     </div>
 
-        <!-- Add Income Section: Moved Here Above the Income Table -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <a href="@Url.Action("Create", "Income")" class="btn btn-success btn-lg px-4 py-2 shadow-sm rounded-3 transition-btn">
-                    <i class="bi bi-plus-circle me-2"></i> Add New Income
-                </a>
-            </div>
+    <div class="pagination-container d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (!(Model.ShowAll))
+                {
+                    @if (Model.PaginatedItems?.HasPreviousPage ?? false)
+                    {
+                        <li class="page-item">
+                            <a class="page-link btn btn-primary" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage - 1)">Previous</a>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= (Model.PaginatedItems?.TotalPages ?? 1); i++)
+                    {
+                        <li class="page-item @(Model.PaginatedItems?.CurrentPage == i ? "active" : "")">
+                            <a class="page-link btn @(Model.PaginatedItems?.CurrentPage == i ? "btn-success" : "btn-outline-secondary")" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.PaginatedItems?.HasNextPage ?? false)
+                    {
+                        <li class="page-item">
+                            <a class="page-link btn btn-primary" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage + 1)">Next</a>
+                        </li>
+                    }
+                }
+            </ul>
+        </nav>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mb-3">
+        @if (!Model.ShowAll)
+        {
+            <a class="btn btn-success" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&showAll=true">Show All</a>
+        } 
+        else if (Model.ShowAll)
+        {
+        <a class="btn btn-warning" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&showAll=false">Show Less</a>
+        }
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="@Url.Action("Create", "Income")" class="btn btn-success btn-lg px-4 py-2 shadow-sm rounded-3 transition-btn">
+                <i class="bi bi-plus-circle me-2"></i> Add New Income
+            </a>
         </div>
+    </div>
+
+
 </div>
