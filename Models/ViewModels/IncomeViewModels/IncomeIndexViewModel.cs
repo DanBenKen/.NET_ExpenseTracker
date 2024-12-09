@@ -9,7 +9,9 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
         public int? SelectedYear { get; set; }
         public string SelectedSource { get; set; }
         public bool ShowAll { get; set; }
+        public int PageSize { get; set; } = 10;
 
+        public List<int> PageSizeOptions { get; set; }
         public List<Income> Incomes { get; set; }
         public IEnumerable<SelectListItem> Months { get; set; }
         public IEnumerable<SelectListItem> Sources { get; set; }

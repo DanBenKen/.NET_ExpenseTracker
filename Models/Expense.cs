@@ -14,12 +14,12 @@ namespace ExpenseTracker.Models
 
         [Required]
         [DataType(DataType.Currency)]
-        [ValidExpenseAmount]
+        [ValidAmount]
         public decimal Amount { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        [ValidExpenseDate]
+        [ValidDateInFuture]
         public DateTime Date { get; set; } = DateTime.Now;
 
         [Required]

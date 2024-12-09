@@ -86,24 +86,51 @@
             <ul class="pagination">
                 @if (!(Model.ShowAll))
                 {
+                    <!-- Form for selecting the page size with category filtering -->
+                    <form method="get" asp-action="Index" asp-controller="Income" class="d-inline-flex align-items-center me-3">
+                        <input type="hidden" name="month" value="@Model.SelectedMonth" />
+                        <input type="hidden" name="year" value="@Model.SelectedYear" />
+                        <input type="hidden" name="source" value="@Model.SelectedSource" />
+                        <select name="pageSize" asp-for="PageSize"
+                                asp-items="@(new SelectList(Model.PageSizeOptions))"
+                                class="form-select form-select-sm bg-light"
+                                onchange="this.form.submit();">
+                        </select>
+                    </form>
+
+                    <!-- Previous page button logic with pageSize in URL -->
                     @if (Model.PaginatedItems?.HasPreviousPage ?? false)
                     {
                         <li class="page-item">
-                            <a class="page-link btn btn-primary" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage - 1)">Previous</a>
+                            <a class="page-link btn btn-outline-primary border-0 shadow-sm"
+                               href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage - 1)&pageSize=@Model.PageSize"
+                               data-bs-toggle="tooltip" title="Previous page">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </a>
                         </li>
                     }
 
+                    <!-- Loop to render page number buttons dynamically -->
                     @for (int i = 1; i <= (Model.PaginatedItems?.TotalPages ?? 1); i++)
                     {
                         <li class="page-item @(Model.PaginatedItems?.CurrentPage == i ? "active" : "")">
-                            <a class="page-link btn @(Model.PaginatedItems?.CurrentPage == i ? "btn-success" : "btn-outline-secondary")" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@i">@i</a>
+                            <a class="page-link btn @(Model.PaginatedItems?.CurrentPage == i ? "btn-success" : "btn-outline-secondary") border-0 shadow-sm mx-1"
+                               href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@i&pageSize=@Model.PageSize"
+                               data-bs-toggle="tooltip" title="Go to page @i">
+                                @i
+                            </a>
                         </li>
                     }
 
+                    <!-- Next page button logic with pageSize in URL -->
                     @if (Model.PaginatedItems?.HasNextPage ?? false)
                     {
                         <li class="page-item">
-                            <a class="page-link btn btn-primary" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage + 1)">Next</a>
+                            <a class="page-link btn btn-outline-primary border-0 shadow-sm"
+                               href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&pageNumber=@(Model.PaginatedItems.CurrentPage + 1)&pageSize=@Model.PageSize"
+                               data-bs-toggle="tooltip" title="Next page">
+                                Next <i class="bi bi-chevron-right"></i>
+                            </a>
                         </li>
                     }
                 }
@@ -115,10 +142,10 @@
         @if (!Model.ShowAll)
         {
             <a class="btn btn-success" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&showAll=true">Show All</a>
-        } 
+        }
         else if (Model.ShowAll)
         {
-        <a class="btn btn-warning" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&showAll=false">Show Less</a>
+            <a class="btn btn-warning" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedSource&showAll=false">Show Less</a>
         }
     </div>
 

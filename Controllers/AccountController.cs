@@ -52,15 +52,15 @@ namespace ExpenseTracker.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
+
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
+
                     return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login credentials.");
-                }
+
+                ModelState.AddModelError(string.Empty, "Invalid login credentials.");
             }
 
             return View(model);

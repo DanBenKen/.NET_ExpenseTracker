@@ -1,11 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ExpenseTracker.Utils.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
 {
     public class IncomeCreateViewModel
     {
         [Required]
+        [DataType(DataType.Currency)]
         [Display(Name = "Amount")]
+        [ValidAmount]
         public decimal Amount { get; set; }
 
         [Required]
@@ -14,9 +18,12 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
 
         [Required]
         [Display(Name = "Source")]
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         [Display(Name = "Description")]
+        [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters.")]
         public string? Description { get; set; }
+
+        public List<SelectListItem> Sources { get; set; } = new List<SelectListItem>();
     }
 }

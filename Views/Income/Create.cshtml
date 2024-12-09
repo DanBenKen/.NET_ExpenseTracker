@@ -24,7 +24,11 @@
 
                 <div class="form-group mb-3">
                     <label asp-for="Source" class="form-label">Source <span class="text-danger">*</span></label>
-                    <input asp-for="Source" class="form-control form-control-lg" placeholder="Enter income source" />
+                    <select asp-for="Source"
+                            class="form-select form-select-lg"
+                            asp-items="Model.Sources">
+                        <option value="">Select a Source</option>
+                    </select>
                     <span asp-validation-for="Source" class="text-danger"></span>
                 </div>
 

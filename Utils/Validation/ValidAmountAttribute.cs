@@ -2,18 +2,17 @@
 
 namespace ExpenseTracker.Utils.Validation
 {
-    public class ValidExpenseDateAttribute : ValidationAttribute
+    public class ValidAmountAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(object value, ValidationContext validationContext)
         {
-            if (value is DateTime dateValue)
+            if (value is decimal amount)
             {
-                if (dateValue.Date < DateTime.Now.Date)
+                if (amount < 0)
                 {
-                    return new ValidationResult("The date cannot be in the past.");
+                    return new ValidationResult("Amount must be greater than or equal to 0.");
                 }
             }
-
             return ValidationResult.Success;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using ExpenseTracker.Utils.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
@@ -12,8 +13,9 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
         public string Description { get; set; }
 
         [Required]
-        [DataType(DataType.Currency)]
         [Display(Name = "Amount")]
+        [DataType(DataType.Currency)]
+        [ValidAmount]
         public decimal Amount { get; set; }
 
         [Required]

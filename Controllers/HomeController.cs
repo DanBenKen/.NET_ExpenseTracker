@@ -21,6 +21,11 @@ namespace ExpenseTracker.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var userId = _userManager.GetUserId(User);
 
             var now = DateTime.UtcNow;

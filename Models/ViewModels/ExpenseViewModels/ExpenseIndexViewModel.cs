@@ -9,7 +9,9 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
         public int? SelectedYear { get; set; }
         public string SelectedCategory { get; set; }
         public bool ShowAll { get; set; }
+        public int PageSize { get; set; } = 10;
 
+        public List<int> PageSizeOptions { get; set; }
         public List<Expense> Expenses { get; set; }
         public IEnumerable<SelectListItem> Months { get; set; }
         public IEnumerable<SelectListItem> Categories { get; set; }

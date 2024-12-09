@@ -8,7 +8,7 @@ namespace ExpenseTracker.Models.ViewModels.AccountViewModels
         [Required]
         [Display(Name = "Allowed Overdraft Limit")]
         [DataType(DataType.Currency)]
-        [ValidExpenseAmount]
+        [ValidAmount]
         public decimal AllowedOverdraftLimit { get; set; }
     }
 }

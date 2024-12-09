@@ -24,37 +24,51 @@ namespace ExpenseTracker.Controllers
             _helperMethods = helperMethods;
         }
 
-        public async Task<IActionResult> Index(int? month, int? year, string category, int pageNumber = 1, int pageSize = 10, bool showAll = false)
+        public async Task<IActionResult> Index(int? month, int? year, string? category, int pageNumber = 1, int pageSize = 10, bool showAll = false)
         {
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
+            category ??= "all_categories";
 
             var userId = _userManager.GetUserId(User);
 
-            var expensesQuery = _context.Expenses
-                .Where(e => e.UserId == userId);
+            var categoriesList = _helperMethods.GetCategories();
 
-            bool hasValidCategory = !string.IsNullOrEmpty(category) && category != "AllCategories";
+            bool hasValidCategory = !string.IsNullOrEmpty(category) && category != "all_categories";
+
+            var expensesQuery = _context.Expenses
+                .Where(e => e.UserId == userId)
+                .Where(e => e.Date.Month == month && e.Date.Year == year);
 
             if (hasValidCategory)
             {
                 expensesQuery = expensesQuery.Where(e => e.Category == category);
             }
 
-            expensesQuery = expensesQuery.Where(e => e.Date.Month == month && e.Date.Year == year);
-
             if (showAll)
             {
                 var allExpenses = await expensesQuery.ToListAsync();
+
+                var mappedExpenses = allExpenses.Select(e => new Expense
+                {
+                    Id = e.Id,
+                    Amount = e.Amount,
+                    Date = e.Date,
+                    Description = e.Description,
+                    Category = categoriesList.FirstOrDefault(s => s.Value == e.Category)?.Text ?? "Unknown Source"
+                }).ToList();
+
                 var viewModel = new ExpenseIndexViewModel
                 {
-                    Expenses = allExpenses,
+                    Expenses = mappedExpenses,
                     SelectedMonth = month,
                     SelectedYear = year,
                     SelectedCategory = category,
                     ShowAll = true,
                     Months = _helperMethods.GetMonths(),
-                    Categories = _helperMethods.GetCategories()
+                    Categories = categoriesList,
+                    PageSizeOptions = _helperMethods.pageSizeList,
+                    PageSize = pageSize
                 };
 
                 return View(viewModel);
@@ -62,20 +76,32 @@ namespace ExpenseTracker.Controllers
 
             var paginatedExpenses = await PaginatedList<Expense>.CreateAsync(expensesQuery, pageNumber, pageSize);
 
+            var mappedPaginatedExpenses = paginatedExpenses.Items.Select(e => new Expense
+            {
+                Id = e.Id,
+                Amount = e.Amount,
+                Date = e.Date,
+                Description = e.Description,
+                Category = categoriesList.FirstOrDefault(s => s.Value == e.Category)?.Text ?? "Unknown Source"
+            }).ToList();
+
             var viewModelPaginated = new ExpenseIndexViewModel
             {
-                Expenses = paginatedExpenses.Items,
+                Expenses = mappedPaginatedExpenses,
                 PaginatedItems = paginatedExpenses,
                 SelectedMonth = month,
                 SelectedYear = year,
                 SelectedCategory = category,
                 ShowAll = false,
                 Months = _helperMethods.GetMonths(),
-                Categories = _helperMethods.GetCategories()
+                Categories = categoriesList,
+                PageSizeOptions = _helperMethods.pageSizeList,
+                PageSize = pageSize
             };
 
             return View(viewModelPaginated);
         }
+
 
         public IActionResult Create()
         {
@@ -101,6 +127,7 @@ namespace ExpenseTracker.Controllers
             }
 
             var userId = _userManager.GetUserId(User);
+
             var expense = new Expense
             {
                 Description = viewModel.Description,
@@ -113,7 +140,7 @@ namespace ExpenseTracker.Controllers
             _context.Add(expense);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Expense");
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -126,7 +153,7 @@ namespace ExpenseTracker.Controllers
 
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Expense");
         }
 
         public async Task<IActionResult> Edit(int id)
