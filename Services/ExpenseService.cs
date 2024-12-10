@@ -4,6 +4,7 @@ using ExpenseTracker.Models;
 using ExpenseTracker.Services.Interface;
 using ExpenseTracker.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ExpenseTracker.Services
 {
@@ -41,52 +42,12 @@ namespace ExpenseTracker.Services
             if (showAll)
             {
                 var allExpenses = await expensesQuery.ToListAsync();
-
-                var mappedExpenses = allExpenses.Select(e => new Expense
-                {
-                    Id = e.Id,
-                    Amount = e.Amount,
-                    Date = e.Date,
-                    Description = e.Description,
-                    Category = categoriesList.FirstOrDefault(s => s.Value == e.Category)?.Text ?? "Unknown Source"
-                }).ToList();
-
-                return new ExpenseIndexViewModel
-                {
-                    Expenses = mappedExpenses,
-                    SelectedMonth = month,
-                    SelectedYear = year,
-                    SelectedCategory = category,
-                    ShowAll = true,
-                    Months = _monthsHelper.GetMonths(),
-                    Categories = categoriesList,
-                    PageSize = pageSize
-                };
+                return MapToExpenseIndexViewModel(allExpenses, categoriesList, month.Value, year.Value, category, pageSize, showAll, null);
             }
 
             var paginatedExpenses = await PaginatedList<Expense>.CreateAsync(expensesQuery, pageNumber, pageSize);
 
-            var mappedPaginatedExpenses = paginatedExpenses.Items.Select(e => new Expense
-            {
-                Id = e.Id,
-                Amount = e.Amount,
-                Date = e.Date,
-                Description = e.Description,
-                Category = categoriesList.FirstOrDefault(s => s.Value == e.Category)?.Text ?? "Unknown Source"
-            }).ToList();
-
-            return new ExpenseIndexViewModel
-            {
-                Expenses = mappedPaginatedExpenses,
-                PaginatedItems = paginatedExpenses,
-                SelectedMonth = month,
-                SelectedYear = year,
-                SelectedCategory = category,
-                ShowAll = false,
-                Months = _monthsHelper.GetMonths(),
-                Categories = categoriesList,
-                PageSize = pageSize
-            };
+            return MapToExpenseIndexViewModel(paginatedExpenses.Items, categoriesList, month.Value, year.Value, category, pageSize, showAll, paginatedExpenses);
         }
 
         public async Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, string userId)
@@ -102,12 +63,15 @@ namespace ExpenseTracker.Services
 
             _context.Add(expense);
             await _context.SaveChangesAsync();
+
             return true;
         }
 
         public async Task<bool> DeleteExpenseAsync(int id, string userId)
         {
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+            if (expense == null)
+                return false;
 
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
@@ -117,8 +81,9 @@ namespace ExpenseTracker.Services
 
         public async Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, string userId)
         {
-            var expense = await _context.Expenses
-                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+            if (expense == null)
+                return null;
 
             return new ExpenseCreateEditViewModel
             {
@@ -133,13 +98,9 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> UpdateExpenseAsync(ExpenseCreateEditViewModel model, string userId)
         {
-            var expense = await _context.Expenses
-                .FirstOrDefaultAsync(e => e.Id == model.Id && e.UserId == userId);
-
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == model.Id && e.UserId == userId);
             if (expense == null)
-            {
                 return false;
-            }
 
             expense.Date = model.Date;
             expense.Description = model.Description;
@@ -147,7 +108,33 @@ namespace ExpenseTracker.Services
             expense.Amount = model.Amount;
 
             await _context.SaveChangesAsync();
+
             return true;
+        }
+
+        private ExpenseIndexViewModel MapToExpenseIndexViewModel(IEnumerable<Expense> expenses, List<SelectListItem> categoriesList, int month, int year, string category, int pageSize, bool showAll, PaginatedList<Expense>? paginatedList)
+        {
+            var mappedExpenses = expenses.Select(e => new Expense
+            {
+                Id = e.Id,
+                Amount = e.Amount,
+                Date = e.Date,
+                Description = e.Description,
+                Category = categoriesList.FirstOrDefault(c => c.Value == e.Category)?.Text ?? "Unknown Category"
+            }).ToList();
+
+            return new ExpenseIndexViewModel
+            {
+                Expenses = mappedExpenses,
+                PaginatedItems = paginatedList,
+                SelectedMonth = month,
+                SelectedYear = year,
+                SelectedCategory = category,
+                ShowAll = showAll,
+                Months = _monthsHelper.GetMonths(),
+                Categories = categoriesList,
+                PageSize = pageSize
+            };
         }
     }
 }

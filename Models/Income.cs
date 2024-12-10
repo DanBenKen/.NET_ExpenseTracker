@@ -1,4 +1,6 @@
-﻿namespace ExpenseTracker.Models
+﻿using ExpenseTracker.Utils.Validation;
+
+namespace ExpenseTracker.Models
 {
     public class Income
     {

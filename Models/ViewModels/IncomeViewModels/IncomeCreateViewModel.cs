@@ -14,6 +14,7 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
 
         [Required]
         [Display(Name = "Date")]
+        [ValidDateNotInPreviousMonth]
         public DateTime Date { get; set; }
 
         [Required]

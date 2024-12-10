@@ -21,6 +21,7 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Date")]
+        [ValidDateNotInPreviousMonth]
         public DateTime Date { get; set; } = DateTime.Now;
 
         [Required]

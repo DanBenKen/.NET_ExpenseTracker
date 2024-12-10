@@ -4,6 +4,7 @@ using ExpenseTracker.Utils;
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Services.Interface;
 using ExpenseTracker.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ExpenseTracker.Services
 {
@@ -27,7 +28,6 @@ namespace ExpenseTracker.Services
             source ??= "all_sources";
 
             var sourcesList = _sourcesHelper.GetSources();
-
             var hasSource = !string.IsNullOrEmpty(source) && source != "all_sources";
 
             var incomesQuery = _context.Incomes
@@ -43,51 +43,12 @@ namespace ExpenseTracker.Services
             {
                 var incomes = await incomesQuery.ToListAsync();
 
-                var mappedIncomes = incomes.Select(i => new Income
-                {
-                    Id = i.Id,
-                    Amount = i.Amount,
-                    Date = i.Date,
-                    Description = i.Description,
-                    Source = sourcesList.FirstOrDefault(s => s.Value == i.Source)?.Text ?? "Unknown Source"
-                }).ToList();
-
-                return new IncomeIndexViewModel
-                {
-                    Incomes = mappedIncomes,
-                    SelectedMonth = month,
-                    SelectedYear = year,
-                    SelectedSource = source,
-                    ShowAll = true,
-                    Months = _monthsHelper.GetMonths(),
-                    Sources = sourcesList,
-                    PageSize = pageSize
-                };
+                return MapToIncomeIndexViewModel(incomes, sourcesList, month.Value, year.Value, source, pageSize, showAll, null);
             }
 
             var paginatedIncomes = await PaginatedList<Income>.CreateAsync(incomesQuery, pageNumber, pageSize);
 
-            var mappedPaginatedIncomes = paginatedIncomes.Items.Select(i => new Income
-            {
-                Id = i.Id,
-                Amount = i.Amount,
-                Date = i.Date,
-                Description = i.Description,
-                Source = sourcesList.FirstOrDefault(s => s.Value == i.Source)?.Text ?? "Unknown Source"
-            }).ToList();
-
-            return new IncomeIndexViewModel
-            {
-                Incomes = mappedPaginatedIncomes,
-                PaginatedItems = paginatedIncomes,
-                SelectedMonth = month,
-                SelectedYear = year,
-                SelectedSource = source,
-                ShowAll = false,
-                Months = _monthsHelper.GetMonths(),
-                Sources = sourcesList,
-                PageSize = pageSize
-            };
+            return MapToIncomeIndexViewModel(paginatedIncomes.Items, sourcesList, month.Value, year.Value, source, pageSize, showAll, paginatedIncomes);
         }
 
         public IncomeCreateViewModel GetCreateIncomeViewModel(string userId)
@@ -106,9 +67,6 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> CreateIncomeAsync(IncomeCreateViewModel viewModel, string userId)
         {
-            if (viewModel == null || string.IsNullOrEmpty(userId))
-                return false;
-
             var income = new Income
             {
                 Amount = viewModel.Amount,
@@ -126,9 +84,6 @@ namespace ExpenseTracker.Services
 
         public async Task<IncomeCreateViewModel?> GetIncomeForEditAsync(int id, string userId)
         {
-            if (string.IsNullOrEmpty(userId))
-                return null;
-
             var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
 
             if (income == null)
@@ -146,9 +101,6 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> UpdateIncomeAsync(int id, string userId, IncomeCreateViewModel viewModel)
         {
-            if (string.IsNullOrEmpty(userId) || viewModel == null)
-                return false;
-
             var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
             if (income == null)
                 return false;
@@ -166,9 +118,6 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> DeleteIncomeAsync(int id, string userId)
         {
-            if (string.IsNullOrEmpty(userId))
-                return false;
-
             var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
             if (income == null)
                 return false;
@@ -177,6 +126,31 @@ namespace ExpenseTracker.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private IncomeIndexViewModel MapToIncomeIndexViewModel(IEnumerable<Income> incomes, List<SelectListItem> sourcesList, int month, int year, string source, int pageSize, bool showAll, PaginatedList<Income>? paginatedList)
+        {
+            var mappedIncomes = incomes.Select(i => new Income
+            {
+                Id = i.Id,
+                Amount = i.Amount,
+                Date = i.Date,
+                Description = i.Description,
+                Source = sourcesList.FirstOrDefault(s => s.Value == i.Source)?.Text ?? "Unknown Source"
+            }).ToList();
+
+            return new IncomeIndexViewModel
+            {
+                Incomes = mappedIncomes,
+                PaginatedItems = paginatedList,
+                SelectedMonth = month,
+                SelectedYear = year,
+                SelectedSource = source,
+                ShowAll = showAll,
+                Months = _monthsHelper.GetMonths(),
+                Sources = sourcesList,
+                PageSize = pageSize
+            };
         }
     }
 }

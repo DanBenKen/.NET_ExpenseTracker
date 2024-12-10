@@ -19,7 +19,7 @@ namespace ExpenseTracker.Models
 
         [Required]
         [DataType(DataType.Date)]
-        [ValidDateInFuture]
+        [ValidDateNotInPreviousMonth]
         public DateTime Date { get; set; } = DateTime.Now;
 
         [Required]

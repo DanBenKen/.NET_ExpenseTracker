@@ -22,9 +22,9 @@ namespace ExpenseTracker.Services
         public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
         {
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (result.Succeeded)
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
             }
@@ -52,17 +52,9 @@ namespace ExpenseTracker.Services
 
         public async Task<SetOverdraftLimitViewModel?> GetOverdraftLimitAsync(string? userId)
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                return null;
-            }
-
             var user = await _context.Users.FindAsync(userId);
-
             if (user == null)
-            {
                 return null;
-            }
 
             return new SetOverdraftLimitViewModel
             {
@@ -74,9 +66,7 @@ namespace ExpenseTracker.Services
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
-            {
                 return false;
-            }
 
             user.AllowedOverdraftLimit = allowedOverdraftLimit;
 

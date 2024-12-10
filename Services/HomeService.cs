@@ -52,9 +52,7 @@ namespace ExpenseTracker.Services
         public decimal CalculateRemainingOverdraftLimit(decimal balance, decimal allowedOverdraftLimit)
         {
             if (balance < 0)
-            {
                 return allowedOverdraftLimit + balance;
-            }
 
             return allowedOverdraftLimit;
         }
