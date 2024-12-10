@@ -12,9 +12,9 @@ namespace ExpenseTracker.Controllers
     public class HomeController : Controller
     {
         private readonly IHomeService _homeService;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(IHomeService homeService, UserManager<User> userManager)
+        public HomeController(IHomeService homeService, UserManager<ApplicationUser> userManager)
         {
             _homeService = homeService;
             _userManager = userManager;

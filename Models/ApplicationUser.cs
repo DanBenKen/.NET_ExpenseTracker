@@ -2,7 +2,7 @@
 
 namespace ExpenseTracker.Models
 {
-    public class User : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public decimal? AllowedOverdraftLimit { get; set; }
     }

@@ -10,9 +10,9 @@ namespace ExpenseTracker.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountController(IAccountService accountService, UserManager<User> userManager)
+        public AccountController(IAccountService accountService, UserManager<ApplicationUser> userManager)
         {
             _accountService = accountService;
             _userManager = userManager;
@@ -78,8 +78,6 @@ namespace ExpenseTracker.Controllers
             {
                 return NotFound();
             }
-
-            Console.WriteLine($"User found: {viewModel?.AllowedOverdraftLimit}");
 
             return View(viewModel);
         }

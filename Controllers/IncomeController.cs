@@ -13,10 +13,10 @@ namespace ExpenseTracker.Controllers
     public class IncomeController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly HelperMethods _helperMethods;
 
-        public IncomeController(ApplicationDbContext context, UserManager<User> userManager, HelperMethods helperMethods)
+        public IncomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, HelperMethods helperMethods)
         {
             _context = context;
             _userManager = userManager;

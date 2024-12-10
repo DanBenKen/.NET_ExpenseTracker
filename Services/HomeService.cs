@@ -10,9 +10,9 @@ namespace ExpenseTracker.Services
     public class HomeService : IHomeService
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeService(ApplicationDbContext context, UserManager<User> userManager)
+        public HomeService(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
