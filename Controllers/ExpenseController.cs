@@ -22,7 +22,7 @@ namespace ExpenseTracker.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(int? month, int? year, string? category, int pageNumber = 1, int pageSize = 10, bool showAll = false)
+        public async Task<IActionResult> Index(int? month, int? year, string? category, int pageNumber = 1, int pageSize = 5, bool showAll = false)
         {
             var userId = _userManager.GetUserId(User);
             var expensesViewModel = await _expenseService.GetExpensesAsync(userId, month, year, category, pageNumber, pageSize, showAll);

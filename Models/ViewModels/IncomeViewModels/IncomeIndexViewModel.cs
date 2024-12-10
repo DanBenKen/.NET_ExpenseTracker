@@ -9,7 +9,7 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
         public int? SelectedYear { get; set; }
         public string SelectedSource { get; set; }
         public bool ShowAll { get; set; }
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; } = 5;
 
         public List<int> PageSizeOptions { get; set; } = new List<int> { 5, 10, 25, 50 };
         public List<Income> Incomes { get; set; }

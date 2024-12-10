@@ -24,7 +24,7 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int? month, int? year, string? source, int pageNumber = 1, int pageSize = 10, bool showAll = false)
+        public async Task<IActionResult> Index(int? month, int? year, string? source, int pageNumber = 1, int pageSize = 5, bool showAll = false)
         {
             var userId = _userManager.GetUserId(User);
 
