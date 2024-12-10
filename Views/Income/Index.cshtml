@@ -86,7 +86,6 @@
             <ul class="pagination">
                 @if (!(Model.ShowAll))
                 {
-                    <!-- Form for selecting the page size with category filtering -->
                     <form method="get" asp-action="Index" asp-controller="Income" class="d-inline-flex align-items-center me-3">
                         <input type="hidden" name="month" value="@Model.SelectedMonth" />
                         <input type="hidden" name="year" value="@Model.SelectedYear" />
@@ -98,7 +97,6 @@
                         </select>
                     </form>
 
-                    <!-- Previous page button logic with pageSize in URL -->
                     @if (Model.PaginatedItems?.HasPreviousPage ?? false)
                     {
                         <li class="page-item">
@@ -110,7 +108,6 @@
                         </li>
                     }
 
-                    <!-- Loop to render page number buttons dynamically -->
                     @for (int i = 1; i <= (Model.PaginatedItems?.TotalPages ?? 1); i++)
                     {
                         <li class="page-item @(Model.PaginatedItems?.CurrentPage == i ? "active" : "")">
@@ -122,7 +119,6 @@
                         </li>
                     }
 
-                    <!-- Next page button logic with pageSize in URL -->
                     @if (Model.PaginatedItems?.HasNextPage ?? false)
                     {
                         <li class="page-item">
