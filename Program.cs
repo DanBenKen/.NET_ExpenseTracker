@@ -11,10 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddSingleton<HelperMethods>();
+builder.Services.AddSingleton<SourcesHelper>();
+builder.Services.AddSingleton<CategoryHelper>();
+builder.Services.AddSingleton<MonthsHelper>();
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

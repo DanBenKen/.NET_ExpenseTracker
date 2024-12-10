@@ -3,7 +3,6 @@ using ExpenseTracker.Models;
 using ExpenseTracker.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using ExpenseTracker.Data;
-using System.Security.Claims;
 
 namespace ExpenseTracker.Services
 {

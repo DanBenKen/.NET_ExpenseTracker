@@ -3,34 +3,30 @@ using ExpenseTracker.Models.ViewModels.ExpenseViewModels;
 using ExpenseTracker.Models;
 using ExpenseTracker.Services.Interface;
 using ExpenseTracker.Utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace ExpenseTracker.Services
 {
     public class ExpenseService : IExpenseService
     {
         private readonly ApplicationDbContext _context;
-        private readonly HelperMethods _helperMethods;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly CategoryHelper _categoryHelper;
+        private readonly MonthsHelper _monthsHelper;
 
-        public ExpenseService(ApplicationDbContext context, HelperMethods helperMethods, UserManager<ApplicationUser> userManager)
+        public ExpenseService(ApplicationDbContext context, CategoryHelper categoryHelper, MonthsHelper monthsHelper)
         {
             _context = context;
-            _helperMethods = helperMethods;
-            _userManager = userManager;
+            _categoryHelper = categoryHelper;
+            _monthsHelper = monthsHelper;
         }
 
-        public async Task<ExpenseIndexViewModel> GetExpensesAsync(ClaimsPrincipal user, int? month, int? year, string? category, int pageNumber, int pageSize, bool showAll)
+        public async Task<ExpenseIndexViewModel> GetExpensesAsync(string userId, int? month, int? year, string? category, int pageNumber, int pageSize, bool showAll)
         {
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
             category ??= "all_categories";
 
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var categoriesList = _helperMethods.GetCategories();
+            var categoriesList = _categoryHelper.GetCategories();
             bool hasValidCategory = !string.IsNullOrEmpty(category) && category != "all_categories";
 
             var expensesQuery = _context.Expenses
@@ -62,9 +58,8 @@ namespace ExpenseTracker.Services
                     SelectedYear = year,
                     SelectedCategory = category,
                     ShowAll = true,
-                    Months = _helperMethods.GetMonths(),
+                    Months = _monthsHelper.GetMonths(),
                     Categories = categoriesList,
-                    PageSizeOptions = _helperMethods.pageSizeList,
                     PageSize = pageSize
                 };
             }
@@ -88,22 +83,14 @@ namespace ExpenseTracker.Services
                 SelectedYear = year,
                 SelectedCategory = category,
                 ShowAll = false,
-                Months = _helperMethods.GetMonths(),
+                Months = _monthsHelper.GetMonths(),
                 Categories = categoriesList,
-                PageSizeOptions = _helperMethods.pageSizeList,
                 PageSize = pageSize
             };
         }
 
-        public async Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, ClaimsPrincipal user)
+        public async Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, string userId)
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-            {
-                return false;
-            }
-
             var expense = new Expense
             {
                 Description = viewModel.Description,
@@ -118,14 +105,9 @@ namespace ExpenseTracker.Services
             return true;
         }
 
-        public async Task<bool> DeleteExpenseAsync(int id, ClaimsPrincipal user)
+        public async Task<bool> DeleteExpenseAsync(int id, string userId)
         {
             var expense = await _context.Expenses.FindAsync(id);
-
-            if (expense == null || expense.UserId != user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
-            {
-                return false;
-            }
 
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
@@ -133,14 +115,10 @@ namespace ExpenseTracker.Services
             return true;
         }
 
-        public async Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, ClaimsPrincipal user)
+        public async Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, string userId)
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var expense = await _context.Expenses
                 .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-
-            if (expense == null)
-                return null;
 
             return new ExpenseCreateEditViewModel
             {
@@ -149,13 +127,12 @@ namespace ExpenseTracker.Services
                 Category = expense.Category,
                 Date = expense.Date,
                 Description = expense.Description,
-                Categories = _helperMethods.GetCategories()
+                Categories = _categoryHelper.GetCategories()
             };
         }
 
-        public async Task<bool> EditExpenseAsync(ExpenseCreateEditViewModel model, ClaimsPrincipal user)
+        public async Task<bool> UpdateExpenseAsync(ExpenseCreateEditViewModel model, string userId)
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var expense = await _context.Expenses
                 .FirstOrDefaultAsync(e => e.Id == model.Id && e.UserId == userId);
 

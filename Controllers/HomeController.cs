@@ -1,6 +1,4 @@
-﻿using ExpenseTracker.Data;
-using ExpenseTracker.Models;
-using ExpenseTracker.Models.ViewModels.HomeViewModels;
+﻿using ExpenseTracker.Models;
 using ExpenseTracker.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,11 +22,6 @@ namespace ExpenseTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             var viewModel = await _homeService.GetHomeIndexDataAsync(userId);
 

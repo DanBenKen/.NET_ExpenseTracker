@@ -11,6 +11,5 @@ namespace ExpenseTracker.Services.Interface
         Task LogoutAsync();
         Task<SetOverdraftLimitViewModel?> GetOverdraftLimitAsync(string? userId);
         Task<bool> SetOverdraftLimitAsync(string userId, decimal allowedOverdraftLimit);
-
     }
 }

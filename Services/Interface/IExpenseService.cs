@@ -5,10 +5,10 @@ namespace ExpenseTracker.Services.Interface
 {
     public interface IExpenseService
     {
-        Task<ExpenseIndexViewModel> GetExpensesAsync(ClaimsPrincipal user, int? month, int? year, string? category, int pageNumber, int pageSize, bool showAll);
-        Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, ClaimsPrincipal user);
-        Task<bool> DeleteExpenseAsync(int id, ClaimsPrincipal user);
-        Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, ClaimsPrincipal user);
-        Task<bool> EditExpenseAsync(ExpenseCreateEditViewModel model, ClaimsPrincipal user);
+        Task<ExpenseIndexViewModel> GetExpensesAsync(string userId, int? month, int? year, string? category, int pageNumber, int pageSize, bool showAll);
+        Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, string userId);
+        Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, string userId);
+        Task<bool> UpdateExpenseAsync(ExpenseCreateEditViewModel viewModel, string userId);
+        Task<bool> DeleteExpenseAsync(int id, string userId);
     }
 }

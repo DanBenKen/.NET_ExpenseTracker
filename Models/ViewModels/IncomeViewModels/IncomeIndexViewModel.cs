@@ -11,7 +11,7 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
         public bool ShowAll { get; set; }
         public int PageSize { get; set; } = 10;
 
-        public List<int> PageSizeOptions { get; set; }
+        public List<int> PageSizeOptions { get; set; } = new List<int> { 5, 10, 25, 50 };
         public List<Income> Incomes { get; set; }
         public IEnumerable<SelectListItem> Months { get; set; }
         public IEnumerable<SelectListItem> Sources { get; set; }

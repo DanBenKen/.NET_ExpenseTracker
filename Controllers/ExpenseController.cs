@@ -1,5 +1,4 @@
-﻿using ExpenseTracker.Data;
-using ExpenseTracker.Models;
+﻿using ExpenseTracker.Models;
 using ExpenseTracker.Models.ViewModels.ExpenseViewModels;
 using ExpenseTracker.Services.Interface;
 using ExpenseTracker.Utils;
@@ -12,18 +11,21 @@ namespace ExpenseTracker.Controllers
     [Authorize]
     public class ExpenseController : Controller
     {
-        private readonly HelperMethods _helperMethods;
+        private readonly CategoryHelper _categoryHelper;
         private readonly IExpenseService _expenseService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ExpenseController(HelperMethods helperMethods, IExpenseService expensesService)
+        public ExpenseController(CategoryHelper categoryHelper, IExpenseService expensesService, UserManager<ApplicationUser> userManager)
         {
-            _helperMethods = helperMethods;
+            _categoryHelper = categoryHelper;
             _expenseService = expensesService;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index(int? month, int? year, string? category, int pageNumber = 1, int pageSize = 10, bool showAll = false)
         {
-            var expensesViewModel = await _expenseService.GetExpensesAsync(User, month, year, category, pageNumber, pageSize, showAll);
+            var userId = _userManager.GetUserId(User);
+            var expensesViewModel = await _expenseService.GetExpensesAsync(userId, month, year, category, pageNumber, pageSize, showAll);
             return View(expensesViewModel);
         }
 
@@ -31,7 +33,7 @@ namespace ExpenseTracker.Controllers
         {
             var viewModel = new ExpenseCreateEditViewModel
             {
-                Categories = _helperMethods.GetCategories()
+                Categories = _categoryHelper.GetCategories()
             };
 
             return View(viewModel);
@@ -43,29 +45,29 @@ namespace ExpenseTracker.Controllers
         {
             if (!ModelState.IsValid)
             {
-                viewModel.Categories = _helperMethods.GetCategories();
+                viewModel.Categories = _categoryHelper.GetCategories();
                 return View(viewModel);
             }
 
-            var result = await _expenseService.CreateExpenseAsync(viewModel, User);
-            if (result)
+            var userId = _userManager.GetUserId(User);
+
+            var result = await _expenseService.CreateExpenseAsync(viewModel, userId);
+            if (!result)
             {
-                return RedirectToAction("Index", "Expense");
+                viewModel.Categories = _categoryHelper.GetCategories();
+                return View(viewModel);
             }
 
-            ModelState.AddModelError(string.Empty, "Unable to create expense. Please try again.");
-            viewModel.Categories = _helperMethods.GetCategories();
-            return View(viewModel);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var viewModel = await _expenseService.GetExpenseByIdAsync(id, User);
+            var userId = _userManager.GetUserId(User);
 
+            var viewModel = await _expenseService.GetExpenseByIdAsync(id, userId);
             if (viewModel == null)
-            {
                 return NotFound();
-            }
 
             return View(viewModel);
         }
@@ -74,32 +76,31 @@ namespace ExpenseTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ExpenseCreateEditViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _expenseService.EditExpenseAsync(model, User);
-
-                if (result)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-
-                return NotFound();
+                model.Categories = _categoryHelper.GetCategories();
+                return View(model);
             }
 
-            model.Categories = _helperMethods.GetCategories();
-            return View(model);
+            var userId = _userManager.GetUserId(User);
+
+            var result = await _expenseService.UpdateExpenseAsync(model, userId);
+            if (!result)
+                return NotFound();
+
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _expenseService.DeleteExpenseAsync(id, User);
+            var userId = _userManager.GetUserId(User);
 
-            if (result)
-            {
-                return RedirectToAction("Index", "Expense");
-            }
+            var result = await _expenseService.DeleteExpenseAsync(id, userId);
+            if (!result)
+                return NotFound();
 
-            return NotFound();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

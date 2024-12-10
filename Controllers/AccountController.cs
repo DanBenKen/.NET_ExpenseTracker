@@ -23,17 +23,14 @@ namespace ExpenseTracker.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _accountService.RegisterAsync(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
+            var result = await _accountService.RegisterAsync(model);
+            if (!result.Succeeded)
+                return NotFound();
 
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Login() => View();
@@ -41,17 +38,14 @@ namespace ExpenseTracker.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var loginSuccessful = await _accountService.LoginAsync(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-                if (loginSuccessful)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
+            var loginSuccessful = await _accountService.LoginAsync(model);
+            if (!loginSuccessful)
+                return NotFound();
 
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -67,17 +61,9 @@ namespace ExpenseTracker.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
             var viewModel = await _accountService.GetOverdraftLimitAsync(userId);
-
             if (viewModel == null)
-            {
                 return NotFound();
-            }
 
             return View(viewModel);
         }
@@ -88,23 +74,13 @@ namespace ExpenseTracker.Controllers
         public async Task<IActionResult> SetOverdraftLimit(SetOverdraftLimitViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var userId = _userManager.GetUserId(User);
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
             var result = await _accountService.SetOverdraftLimitAsync(userId, model.AllowedOverdraftLimit);
-
             if (!result)
-            {
                 return NotFound();
-            }
 
             return RedirectToAction("Index", "Home");
         }
