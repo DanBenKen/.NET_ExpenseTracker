@@ -1,6 +1,6 @@
 ﻿using ExpenseTracker.Models.ViewModels.HomeViewModels;
 
-namespace ExpenseTracker.Services.Interface
+namespace ExpenseTracker.Services.Interfaces
 {
     public interface IHomeService
     {

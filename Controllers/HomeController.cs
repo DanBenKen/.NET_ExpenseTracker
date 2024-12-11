@@ -1,5 +1,5 @@
 ﻿using ExpenseTracker.Models;
-using ExpenseTracker.Services.Interface;
+using ExpenseTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

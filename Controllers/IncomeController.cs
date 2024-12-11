@@ -1,7 +1,7 @@
 ﻿using ExpenseTracker.Data;
 using ExpenseTracker.Models;
 using ExpenseTracker.Models.ViewModels.IncomeViewModels;
-using ExpenseTracker.Services.Interface;
+using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

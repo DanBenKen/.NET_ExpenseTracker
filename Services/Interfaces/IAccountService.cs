@@ -1,8 +1,7 @@
 ﻿using ExpenseTracker.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 
-namespace ExpenseTracker.Services.Interface
+namespace ExpenseTracker.Services.Interfaces
 {
     public interface IAccountService
     {

@@ -1,7 +1,7 @@
 ﻿using ExpenseTracker.Data;
 using ExpenseTracker.Models.ViewModels.ExpenseViewModels;
 using ExpenseTracker.Models;
-using ExpenseTracker.Services.Interface;
+using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;

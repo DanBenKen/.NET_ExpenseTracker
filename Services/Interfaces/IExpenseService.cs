@@ -1,7 +1,6 @@
 ﻿using ExpenseTracker.Models.ViewModels.ExpenseViewModels;
-using System.Security.Claims;
 
-namespace ExpenseTracker.Services.Interface
+namespace ExpenseTracker.Services.Interfaces
 {
     public interface IExpenseService
     {
