@@ -21,9 +21,15 @@ namespace ExpenseTracker.Services
 
         public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
         {
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var passwordValidationResult = await ValidatePasswordAsync(model.Password);
+            if (!passwordValidationResult.Succeeded)
+            {
+                return passwordValidationResult;
+            }
 
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
@@ -32,18 +38,42 @@ namespace ExpenseTracker.Services
             return result;
         }
 
-        public async Task<bool> LoginAsync(LoginViewModel model)
+        public async Task<IdentityResult> ValidatePasswordAsync(string password)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var passwordValidators = _userManager.PasswordValidators;
+            var user = new ApplicationUser();
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            foreach (var validator in passwordValidators)
             {
-                await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
-                return true;
+                var result = await validator.ValidateAsync(_userManager, user, password);
+                if (!result.Succeeded)
+                {
+                    return result;
+                }
             }
 
-            return false;
+            return IdentityResult.Success;
         }
+
+        public async Task<SignInResult> LoginAsync(LoginViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return SignInResult.Failed;
+            }
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!passwordValid)
+            {
+                return SignInResult.Failed;
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
+
+            return SignInResult.Success;
+        }
+
 
         public async Task LogoutAsync()
         {

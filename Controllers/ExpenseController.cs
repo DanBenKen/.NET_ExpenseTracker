@@ -25,6 +25,7 @@ namespace ExpenseTracker.Controllers
         public async Task<IActionResult> Index(int? month, int? year, string? category, int pageNumber = 1, int pageSize = 5, bool showAll = false)
         {
             var userId = _userManager.GetUserId(User);
+
             var expensesViewModel = await _expenseService.GetExpensesAsync(userId, month, year, category, pageNumber, pageSize, showAll);
             return View(expensesViewModel);
         }
@@ -67,7 +68,7 @@ namespace ExpenseTracker.Controllers
 
             var viewModel = await _expenseService.GetExpenseByIdAsync(id, userId);
             if (viewModel == null)
-                return NotFound();
+                return NotFound("Expense not found.");
 
             return View(viewModel);
         }

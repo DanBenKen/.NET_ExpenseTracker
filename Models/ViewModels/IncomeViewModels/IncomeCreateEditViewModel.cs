@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
 {
-    public class IncomeCreateViewModel
+    public class IncomeCreateEditViewModel
     {
         [Required]
         [DataType(DataType.Currency)]

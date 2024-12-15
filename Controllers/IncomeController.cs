@@ -45,7 +45,7 @@ namespace ExpenseTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(IncomeCreateViewModel viewModel)
+        public async Task<IActionResult> Create(IncomeCreateEditViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace ExpenseTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, IncomeCreateViewModel viewModel)
+        public async Task<IActionResult> Edit(int id, IncomeCreateEditViewModel viewModel)
         {
             if (!ModelState.IsValid)
                 return View(viewModel);

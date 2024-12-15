@@ -7,6 +7,9 @@
             <p class="text-muted">Join us and track your expenses effortlessly</p>
         </div>
         <form asp-action="Register" method="post">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
             <div class="mb-3">
                 <label asp-for="UserName" class="form-label">Username</label>
                 <input asp-for="UserName" class="form-control" placeholder="Enter your username" />

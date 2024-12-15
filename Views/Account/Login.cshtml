@@ -6,6 +6,20 @@
             <h2 class="text-primary">Welcome</h2>
             <p class="text-muted">Please login to your account to continue</p>
         </div>
+
+        <div class="mb-3">
+            @if (ViewData.ModelState != null && ViewData.ModelState.ContainsKey(string.Empty))
+            {
+                var errorMessage = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+                if (errorMessage == "Invalid login attempt.")
+                {
+                    <div class="alert alert-danger">
+                        @errorMessage
+                    </div>
+                }
+            }
+        </div>
+
         <form asp-action="Login" method="post">
             <div class="mb-3">
                 <label asp-for="Email" class="form-label">Email Address</label>

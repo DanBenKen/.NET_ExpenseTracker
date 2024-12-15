@@ -21,7 +21,7 @@ namespace ExpenseTracker.Services
             _monthsHelper = monthsHelper;
         }
 
-        public async Task<IncomeIndexViewModel> GetIncomesViewModelAsync(string userId, int? month, int? year, string? source, int pageNumber, int pageSize, bool showAll)
+        public async Task<IncomeIndexViewModel?> GetIncomesViewModelAsync(string userId, int? month, int? year, string? source, int pageNumber, int pageSize, bool showAll)
         {
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
@@ -51,11 +51,11 @@ namespace ExpenseTracker.Services
             return MapToIncomeIndexViewModel(paginatedIncomes.Items, sourcesList, month.Value, year.Value, source, pageSize, showAll, paginatedIncomes);
         }
 
-        public IncomeCreateViewModel GetCreateIncomeViewModel(string userId)
+        public IncomeCreateEditViewModel GetCreateIncomeViewModel(string userId)
         {
             var sources = _sourcesHelper.GetSources();
 
-            return new IncomeCreateViewModel
+            return new IncomeCreateEditViewModel
             {
                 Amount = 0,
                 Date = DateTime.Now,
@@ -65,7 +65,7 @@ namespace ExpenseTracker.Services
             };
         }
 
-        public async Task<bool> CreateIncomeAsync(IncomeCreateViewModel viewModel, string userId)
+        public async Task<bool> CreateIncomeAsync(IncomeCreateEditViewModel viewModel, string userId)
         {
             var income = new Income
             {
@@ -82,14 +82,14 @@ namespace ExpenseTracker.Services
             return true;
         }
 
-        public async Task<IncomeCreateViewModel?> GetIncomeForEditAsync(int id, string userId)
+        public async Task<IncomeCreateEditViewModel?> GetIncomeForEditAsync(int id, string userId)
         {
             var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
 
             if (income == null)
                 return null;
 
-            return new IncomeCreateViewModel
+            return new IncomeCreateEditViewModel
             {
                 Amount = income.Amount,
                 Date = income.Date,
@@ -99,7 +99,7 @@ namespace ExpenseTracker.Services
             };
         }
 
-        public async Task<bool> UpdateIncomeAsync(int id, string userId, IncomeCreateViewModel viewModel)
+        public async Task<bool> UpdateIncomeAsync(int id, string userId, IncomeCreateEditViewModel viewModel)
         {
             var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
             if (income == null)

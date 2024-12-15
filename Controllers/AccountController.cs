@@ -26,12 +26,29 @@ namespace ExpenseTracker.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            var passwordValidationResult = await _accountService.ValidatePasswordAsync(model.Password);
+            if (!passwordValidationResult.Succeeded)
+            {
+                foreach (var error in passwordValidationResult.Errors)
+                {
+                    ModelState.AddModelError(nameof(model.Password), error.Description);
+                }
+                return View(model);
+            }
+
             var result = await _accountService.RegisterAsync(model);
             if (!result.Succeeded)
-                return NotFound();
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
+
 
         public IActionResult Login() => View();
 
@@ -41,9 +58,13 @@ namespace ExpenseTracker.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var loginSuccessful = await _accountService.LoginAsync(model);
-            if (!loginSuccessful)
-                return NotFound();
+            var result = await _accountService.LoginAsync(model);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(model);
+            }
 
             return RedirectToAction("Index", "Home");
         }
@@ -60,6 +81,8 @@ namespace ExpenseTracker.Controllers
         public async Task<IActionResult> SetOverdraftLimit()
         {
             var userId = _userManager.GetUserId(User);
+            //if (string.IsNullOrEmpty(userId))
+            //    return Unauthorized();            //Defanzivno programiranje.
 
             var viewModel = await _accountService.GetOverdraftLimitAsync(userId);
             if (viewModel == null)
@@ -80,7 +103,10 @@ namespace ExpenseTracker.Controllers
 
             var result = await _accountService.SetOverdraftLimitAsync(userId, model.AllowedOverdraftLimit);
             if (!result)
-                return NotFound();
+            {
+                ModelState.AddModelError("", "Unable to set the overdraft limit. Please try again.");
+                return View(model);
+            }
 
             return RedirectToAction("Index", "Home");
         }

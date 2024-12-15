@@ -9,6 +9,12 @@
         <div class="card-body px-4 pt-3 animate__animated animate__fadeIn">
             <form asp-action="SetOverdraftLimit" method="post">
                 <div class="mb-3">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            @Html.ValidationSummary(true, "There was an issue with your submission: ")
+                        </div>
+                    }
                     <label asp-for="AllowedOverdraftLimit" class="form-label">Allowed Overdraft Limit</label>
                     <input asp-for="AllowedOverdraftLimit"
                            class="form-control"
