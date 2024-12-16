@@ -139,13 +139,11 @@
         {
             <a class="btn btn-success" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedCategory&showAll=true">Show All</a>
         }
-        else if (Model.ShowAll)
+        else
         {
             <a class="btn btn-warning" href="?month=@Model.SelectedMonth&year=@Model.SelectedYear&source=@Model.SelectedCategory&showAll=false">Show Less</a>
         }
     </div>
 
-    <div class="mt-3">
-        <a class="btn btn-success btn-lg" asp-controller="Expense" asp-action="Create">Add New Expense</a>
-    </div>
+    <a class="btn btn-success btn-lg my-3" asp-controller="Expense" asp-action="Create">Add New Expense</a>
 </div>
