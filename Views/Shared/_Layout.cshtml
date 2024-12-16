@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="~/ExpenseTracker.styles.css" asp-append-version="true" />
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated)
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <header>
             <div class="d-flex justify-content-between align-items-center bg-white mb-3 p-3">

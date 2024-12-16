@@ -131,6 +131,7 @@ namespace ExpenseTracker.Services
             var mappedIncomes = incomes.Select(i => new Income
             {
                 Id = i.Id,
+                UserId = i.UserId,
                 Amount = i.Amount,
                 Date = i.Date,
                 Description = i.Description,

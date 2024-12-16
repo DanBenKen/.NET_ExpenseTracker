@@ -6,12 +6,12 @@ namespace ExpenseTracker.Models.ViewModels.AccountViewModels
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
-        public string Password { get; set; }
+        public required string Password { get; set; }
 
         [Display(Name = "Remember Me?")]
         public bool RememberMe { get; set; }

@@ -12,7 +12,7 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
         public int PageSize { get; set; } = 5;
 
         public List<int> PageSizeOptions { get; set; } = new List<int> { 5, 10, 25, 50 };
-        public List<Expense>? Expenses { get; set; }
+        public required List<Expense> Expenses { get; set; }
         public IEnumerable<SelectListItem>? Months { get; set; }
         public IEnumerable<SelectListItem>? Categories { get; set; }
         public PaginatedList<Expense>? PaginatedItems { get; set; }

@@ -6,8 +6,11 @@ namespace ExpenseTracker.Utils.Validation
     {
         private readonly List<string> _validCategories = new() { "Food", "Transport", "Health", "Entertainment" };
 
-        protected override ValidationResult? IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
+            if (value == null)
+                return new ValidationResult("Category is required.");
+
             if (value is string category && _validCategories.Contains(category))
             {
                 return ValidationResult.Success;

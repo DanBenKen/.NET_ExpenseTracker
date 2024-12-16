@@ -4,8 +4,11 @@ namespace ExpenseTracker.Utils.Validation
 {
     public class ValidAmountAttribute : ValidationAttribute
     {
-        protected override ValidationResult? IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
+            if (value == null)
+                return new ValidationResult("Amount is required.");
+
             if (value is decimal amount)
             {
                 if (amount < 0)
