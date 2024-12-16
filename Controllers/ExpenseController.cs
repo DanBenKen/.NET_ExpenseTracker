@@ -2,6 +2,7 @@
 using ExpenseTracker.Models.ViewModels.ExpenseViewModels;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Utils;
+using ExpenseTracker.Utils.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +33,9 @@ namespace ExpenseTracker.Controllers
 
         public IActionResult Create()
         {
-            var viewModel = new ExpenseCreateEditViewModel
-            {
-                Categories = _categoryHelper.GetCategories()
-            };
+            var userId = _userManager.GetUserId(User);
+
+            var viewModel = _expenseService.GetCreateExpenseViewModel(userId);
 
             return View(viewModel);
         }
@@ -85,11 +85,24 @@ namespace ExpenseTracker.Controllers
 
             var userId = _userManager.GetUserId(User);
 
-            var result = await _expenseService.UpdateExpenseAsync(model, userId);
-            if (!result)
-                return NotFound();
+            try
+            {
+                var result = await _expenseService.UpdateExpenseAsync(model, userId);
 
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ExpenseNotFoundException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                model.Categories = _categoryHelper.GetCategories();
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
+                model.Categories = _categoryHelper.GetCategories();
+                return View(model);
+            }
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -98,8 +111,7 @@ namespace ExpenseTracker.Controllers
 
             var result = await _expenseService.DeleteExpenseAsync(id, userId);
             if (!result)
-                return NotFound();
-
+                return NotFound("Expense not found.");
 
             return RedirectToAction(nameof(Index));
         }

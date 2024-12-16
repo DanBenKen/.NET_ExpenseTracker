@@ -8,7 +8,7 @@ namespace ExpenseTracker.Services.Interfaces
         Task<IdentityResult> RegisterAsync(RegisterViewModel model);
         Task<SignInResult> LoginAsync(LoginViewModel model);
         Task LogoutAsync();
-        Task<SetOverdraftLimitViewModel?> GetOverdraftLimitAsync(string? userId);
+        Task<SetOverdraftLimitViewModel> GetOverdraftLimitAsync(string userId);
         Task<bool> SetOverdraftLimitAsync(string userId, decimal allowedOverdraftLimit);
         Task<IdentityResult> ValidatePasswordAsync(string password);
     }

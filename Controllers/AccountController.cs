@@ -1,6 +1,7 @@
 ﻿using ExpenseTracker.Models;
 using ExpenseTracker.Models.ViewModels.AccountViewModels;
 using ExpenseTracker.Services.Interfaces;
+using ExpenseTracker.Utils.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -80,15 +81,21 @@ namespace ExpenseTracker.Controllers
         [HttpGet]
         public async Task<IActionResult> SetOverdraftLimit()
         {
-            var userId = _userManager.GetUserId(User);
-            //if (string.IsNullOrEmpty(userId))
-            //    return Unauthorized();            //Defanzivno programiranje.
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                var viewModel = await _accountService.GetOverdraftLimitAsync(userId);
 
-            var viewModel = await _accountService.GetOverdraftLimitAsync(userId);
-            if (viewModel == null)
-                return NotFound();
-
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (UserNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+            }
         }
 
         [Authorize]
@@ -101,10 +108,23 @@ namespace ExpenseTracker.Controllers
 
             var userId = _userManager.GetUserId(User);
 
-            var result = await _accountService.SetOverdraftLimitAsync(userId, model.AllowedOverdraftLimit);
-            if (!result)
+            try
             {
-                ModelState.AddModelError("", "Unable to set the overdraft limit. Please try again.");
+                var result = await _accountService.SetOverdraftLimitAsync(userId, model.AllowedOverdraftLimit);
+                if (!result)
+                {
+                    ModelState.AddModelError(string.Empty, "Unable to set the overdraft limit. Please try again.");
+                    return View(model);
+                }
+            }
+            catch (UserNotFoundException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
                 return View(model);
             }
 

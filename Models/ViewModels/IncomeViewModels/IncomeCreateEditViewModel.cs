@@ -17,13 +17,13 @@ namespace ExpenseTracker.Models.ViewModels.IncomeViewModels
         [ValidDateNotInPreviousMonth]
         public DateTime Date { get; set; }
 
-        [Required]
-        [Display(Name = "Source")]
-        public string? Source { get; set; }
-
         [Display(Name = "Description")]
         [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters.")]
         public string? Description { get; set; }
+
+        [Required]
+        [Display(Name = "Source")]
+        public required string Source { get; set; }
 
         public List<SelectListItem> Sources { get; set; } = new List<SelectListItem>();
     }

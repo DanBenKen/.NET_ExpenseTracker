@@ -3,6 +3,7 @@ using ExpenseTracker.Models;
 using ExpenseTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using ExpenseTracker.Data;
+using ExpenseTracker.Utils.Exceptions;
 
 namespace ExpenseTracker.Services
 {
@@ -29,10 +30,13 @@ namespace ExpenseTracker.Services
 
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
-
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                if (!signInResult.Succeeded)
+                {
+                    throw new InvalidOperationException("Registration succeeded, but automatic sign-in failed.");
+                }
             }
 
             return result;
@@ -47,9 +51,7 @@ namespace ExpenseTracker.Services
             {
                 var result = await validator.ValidateAsync(_userManager, user, password);
                 if (!result.Succeeded)
-                {
                     return result;
-                }
             }
 
             return IdentityResult.Success;
@@ -59,32 +61,26 @@ namespace ExpenseTracker.Services
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-            {
                 return SignInResult.Failed;
-            }
 
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordValid)
-            {
                 return SignInResult.Failed;
-            }
 
             await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
 
             return SignInResult.Success;
         }
 
-
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<SetOverdraftLimitViewModel?> GetOverdraftLimitAsync(string? userId)
+        public async Task<SetOverdraftLimitViewModel> GetOverdraftLimitAsync(string userId)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                return null;
+            var user = await _context.Users.FindAsync(userId)
+                        ?? throw new UserNotFoundException(userId);
 
             return new SetOverdraftLimitViewModel
             {
@@ -94,9 +90,8 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> SetOverdraftLimitAsync(string userId, decimal allowedOverdraftLimit)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                return false;
+            var user = await _context.Users.FindAsync(userId)
+                        ?? throw new UserNotFoundException(userId);
 
             user.AllowedOverdraftLimit = allowedOverdraftLimit;
 

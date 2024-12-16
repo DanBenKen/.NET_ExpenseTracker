@@ -5,6 +5,7 @@ using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ExpenseTracker.Utils.Exceptions;
 
 namespace ExpenseTracker.Services
 {
@@ -50,6 +51,20 @@ namespace ExpenseTracker.Services
             return MapToExpenseIndexViewModel(paginatedExpenses.Items, categoriesList, month.Value, year.Value, category, pageSize, showAll, paginatedExpenses);
         }
 
+        public ExpenseCreateEditViewModel GetCreateExpenseViewModel(string userId)
+        {
+            var categories = _categoryHelper.GetCategories();
+
+            return new ExpenseCreateEditViewModel
+            {
+                Amount = 0,
+                Category = string.Empty,
+                Date = DateTime.Now,
+                Description = string.Empty,
+                Categories = _categoryHelper.GetCategories()
+            };
+        }
+
         public async Task<bool> CreateExpenseAsync(ExpenseCreateEditViewModel viewModel, string userId)
         {
             var expense = new Expense
@@ -69,9 +84,8 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> DeleteExpenseAsync(int id, string userId)
         {
-            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-            if (expense == null)
-                return false;
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId)
+                ?? throw new ExpenseNotFoundException(id);
 
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
@@ -79,11 +93,10 @@ namespace ExpenseTracker.Services
             return true;
         }
 
-        public async Task<ExpenseCreateEditViewModel?> GetExpenseByIdAsync(int id, string userId)
+        public async Task<ExpenseCreateEditViewModel> GetExpenseByIdAsync(int id, string userId)
         {
-            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-            if (expense == null)
-                return null;
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId)
+                ?? throw new ExpenseNotFoundException(id);
 
             return new ExpenseCreateEditViewModel
             {
@@ -98,9 +111,8 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> UpdateExpenseAsync(ExpenseCreateEditViewModel model, string userId)
         {
-            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == model.Id && e.UserId == userId);
-            if (expense == null)
-                return false;
+            var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == model.Id && e.UserId == userId)
+                ?? throw new ExpenseNotFoundException(model.Id);
 
             expense.Date = model.Date;
             expense.Description = model.Description;

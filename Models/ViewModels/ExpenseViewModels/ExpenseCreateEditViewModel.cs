@@ -10,7 +10,7 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
 
         [Display(Name = "Description")]
         [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters.")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         [Display(Name = "Amount")]
@@ -26,7 +26,7 @@ namespace ExpenseTracker.Models.ViewModels.ExpenseViewModels
 
         [Required]
         [Display(Name = "Category")]
-        public string? Category { get; set; }
+        public required string Category { get; set; }
 
         public List<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
     }

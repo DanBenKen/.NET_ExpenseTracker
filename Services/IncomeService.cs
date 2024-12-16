@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ExpenseTracker.Utils.Exceptions;
 
 namespace ExpenseTracker.Services
 {
@@ -14,14 +15,14 @@ namespace ExpenseTracker.Services
         private readonly SourcesHelper _sourcesHelper;
         private readonly MonthsHelper _monthsHelper;
 
-        public IncomeService(SourcesHelper helperMethods, ApplicationDbContext context, MonthsHelper monthsHelper) 
+        public IncomeService(SourcesHelper helperMethods, ApplicationDbContext context, MonthsHelper monthsHelper)
         {
             _sourcesHelper = helperMethods;
             _context = context;
             _monthsHelper = monthsHelper;
         }
 
-        public async Task<IncomeIndexViewModel?> GetIncomesViewModelAsync(string userId, int? month, int? year, string? source, int pageNumber, int pageSize, bool showAll)
+        public async Task<IncomeIndexViewModel> GetIncomesViewModelAsync(string userId, int? month, int? year, string? source, int pageNumber, int pageSize, bool showAll)
         {
             month ??= DateTime.Now.Month;
             year ??= DateTime.Now.Year;
@@ -82,12 +83,10 @@ namespace ExpenseTracker.Services
             return true;
         }
 
-        public async Task<IncomeCreateEditViewModel?> GetIncomeForEditAsync(int id, string userId)
+        public async Task<IncomeCreateEditViewModel> GetIncomeByIdAsync(int id, string userId)
         {
-            var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
-
-            if (income == null)
-                return null;
+            var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId)
+                ?? throw new IncomeNotFoundException(id);
 
             return new IncomeCreateEditViewModel
             {
@@ -101,13 +100,12 @@ namespace ExpenseTracker.Services
 
         public async Task<bool> UpdateIncomeAsync(int id, string userId, IncomeCreateEditViewModel viewModel)
         {
-            var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
-            if (income == null)
-                return false;
+            var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId)
+                ?? throw new IncomeNotFoundException(id);
 
             income.Amount = viewModel.Amount;
             income.Date = viewModel.Date;
-            income.Source = viewModel.Source;
+            income.Source = viewModel.Source ?? income.Source;
             income.Description = viewModel.Description;
 
             _context.Incomes.Update(income);

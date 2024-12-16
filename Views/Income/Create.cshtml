@@ -26,7 +26,7 @@
                     <label asp-for="Source" class="form-label">Source <span class="text-danger">*</span></label>
                     <select asp-for="Source"
                             class="form-select form-select-lg"
-                            asp-items="Model.Sources">
+                            asp-items="@(new SelectList(Model.Sources, "Value", "Text"))">
                         <option value="">Select a Source</option>
                     </select>
                     <span asp-validation-for="Source" class="text-danger"></span>
